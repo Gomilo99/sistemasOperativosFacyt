@@ -5,8 +5,11 @@ int saldo = 1000;
 
 void proceso_0() {
     while (turn != 0);
+    // Seccion Critica
     saldo -= 500;
+
     turn = 1;
+    // Seccion Restante
 }
 
 void proceso_1() {

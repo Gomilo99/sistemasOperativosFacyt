@@ -25,24 +25,20 @@ void salida(int i) {
 
 void* proceso_0(void* arg) {
     entrada(0);
-    printf("P0: Entra. Saldo: %d\n", saldo);
-    saldo -= 500;
-    printf("P0: Retira 500. Saldo: %d\n", saldo);
+    saldo -= 500;  // SECCIÓN CRÍTICA
     salida(0);
     return NULL;
 }
 
 void* proceso_1(void* arg) {
     entrada(1);
-    printf("P1: Entra. Saldo: %d\n", saldo);
-    saldo -= 300;
-    printf("P1: Retira 300. Saldo: %d\n", saldo);
+    saldo -= 300;  // SECCIÓN CRÍTICA
     salida(1);
     return NULL;
 }
 
 int main() {
-    printf("=== DEKKER V5 (CON LIBRERÍA) ===\n");
+    printf("=== DEKKER V5 ===\n");
     printf("Saldo inicial: %d\n\n", saldo);
     
     // Crear y ejecutar procesos (la librería maneja threads)

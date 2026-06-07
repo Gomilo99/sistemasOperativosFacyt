@@ -9,24 +9,15 @@ int saldo = 1000;
 
 // Función que ejecutará el hilo 0
 void* Hilo0(void* arg) {
-    printf("🔵 Hilo0: Iniciado\n");
-    printf("🔵 Hilo0: Intentando entrar a sección crítica\n");
-    
     // ESPERA A SU TURNO
     while (turnoHilo != 0) {
-        printf("🔵 Hilo0: Esperando... (turno=%d)\n", turnoHilo);
-        usleep(100000);  // Espera 100ms
     }
-    
-    // SECCIÓN CRÍTICA
-    printf("🔵 Hilo0: ¡¡ENTRÉ!! Saldo actual: %d\n", saldo);
+
     saldo -= 500;
-    printf("🔵 Hilo0: Retiré 500. Saldo nuevo: %d\n", saldo);
-    
+
     // LIBERA
     turnoHilo = 1;  // Ahora es turno de Hilo1
-    printf("🔵 Hilo0: Salí. turno=%d\n\n", turnoHilo);
-    
+
     return NULL;
 }
 
