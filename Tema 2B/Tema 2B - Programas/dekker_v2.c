@@ -1,56 +1,48 @@
 #include <stdio.h>
 
-// VARIABLES COMPARTIDAS
-int flag[2] = {0, 0};  // flag[0]=1 si P0 quiere entrar, flag[1]=1 si P1 quiere
+int flag[2] = {0, 0};
 int saldo = 1000;
 
 void proceso_0() {
-    printf("P0: Levanto mi bandera (flag[0]=1)\n");
-    flag[0] = 1;  // "Quiero entrar"
-    
-    // ESPERA A QUE P1 NO ESTÉ DENTRO
-    printf("P0: Revisando si P1 quiere entrar...\n");
-    while (flag[1] == 1) {
-        printf("P0: P1 también quiere. Esperando...\n");
-    }
-    
-    // SECCIÓN CRÍTICA
-    printf("P0: ¡ENTRÉ! Saldo: %d\n", saldo);
+    flag[0] = 1;
+    while (flag[1]);
     saldo -= 500;
-    printf("P0: Retiré 500. Saldo: %d\n", saldo);
-    
-    // LIBERA
-    flag[0] = 0;  // "Ya no quiero"
-    printf("P0: Bajo mi bandera. Salí.\n\n");
+    flag[0] = 0;
 }
 
 void proceso_1() {
-    printf("P1: Levanto mi bandera (flag[1]=1)\n");
-    flag[1] = 1;  // "Quiero entrar"
-    
-    // ESPERA A QUE P0 NO ESTÉ DENTRO
-    printf("P1: Revisando si P0 quiere entrar...\n");
-    while (flag[0] == 1) {
-        printf("P1: P0 también quiere. Esperando...\n");
-    }
-    
-    // SECCIÓN CRÍTICA
-    printf("P1: ¡ENTRÉ! Saldo: %d\n", saldo);
+    flag[1] = 1;
+    while (flag[0]);
     saldo -= 300;
-    printf("P1: Retiré 300. Saldo: %d\n", saldo);
-    
-    // LIBERA
-    flag[1] = 0;  // "Ya no quiero"
-    printf("P1: Bajo mi bandera. Salí.\n\n");
+    flag[1] = 0;
 }
 
 int main() {
-    printf("===== ALGORITMO DE DEKKER - VERSIÓN 2 =====\n");
-    printf("Saldo inicial: %d\n\n", saldo);
+    printf("=== DEKKER V2 ===\n");
+    printf("Inicial: %d\n\n", saldo);
     
     proceso_0();
+    printf("P0: %d\n", saldo);
     proceso_1();
+    printf("P1: %d\n", saldo);
     
-    printf("Saldo final: %d (Debería ser: 200)\n", saldo);
+    printf("Final: %d\n", saldo);
     return 0;
 }
+
+/*
+CORRIDA EN FRÍO:
+=== DEKKER V2 ===
+Inicial: 1000
+
+P0: 500
+P1: 200
+
+Final: 200
+
+PROBLEMA: ¿Qué pasa si ambos levantan flags simultáneamente?
+flag[0]=1, flag[1]=1
+→ P0 ve flag[1]=1, espera
+→ P1 ve flag[0]=1, espera
+→ DEADLOCK MUTUO
+*/
