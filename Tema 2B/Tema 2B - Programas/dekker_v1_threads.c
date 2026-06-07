@@ -16,13 +16,10 @@ void* proceso_0(void* arg) {
     while (turnoHilo != 0) {
         /* Espera su turno */
     }
-
     // Entra a la sección crítica
     saldo -= 500;
-
     // Cambio de turno
     turnoHilo = (turnoHilo + 1) % totalHilos;
-
     // Resto del código
     return NULL;
 }
@@ -32,25 +29,17 @@ void* proceso_1(void* arg) {
     while (turnoHilo != 1) {
         /* Espera su turno */
     }
-
     // Entra a la sección crítica
     saldo -= 300;
-
     // Cambio de turno
     turnoHilo = (turnoHilo + 1) % totalHilos;
-
     // Resto del código
     return NULL;
 }
 
 int main() {
-    printf("=== DEKKER V1 ===\n");
-    printf("Saldo inicial: %d\n\n", saldo);
-
     ThreadPair procesos = crear_procesos(proceso_0, proceso_1);
     esperar_procesos(procesos);
-
-    printf("\nSaldo final: %d\n", saldo);
     return 0;
 }
 

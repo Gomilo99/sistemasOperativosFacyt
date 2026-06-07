@@ -13,10 +13,10 @@ void* hilo_0(void* arg) {
     /*
     Código que no afecta datos compartidos
     */
+    estadoHilo[0] = 1;
     while (estadoHilo[1]) {
         /* Espera su turno */
     }
-    estadoHilo[0] = 1;
     // Entra a la seccion critica
     saldo -= 500;
     // Resto del codigo
@@ -30,10 +30,10 @@ void* hilo_1(void* arg) {
     /*
     Código que no afecta datos compartidos
     */
+    estadoHilo[1] = 1;
     while (estadoHilo[0]) {
         /* Espera su turno */
     }
-    estadoHilo[1] = 1;
     // Entra a la seccion critica
     saldo -= 300;
     // Resto del codigo
