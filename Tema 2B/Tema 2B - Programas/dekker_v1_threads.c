@@ -44,10 +44,6 @@ void* proceso_1(void* arg) {
 }
 
 int main() {
-    turnoHilo = 0;
-    totalHilos = 2;
-    saldo = 1000;
-
     printf("=== DEKKER V1 ===\n");
     printf("Saldo inicial: %d\n\n", saldo);
 
