@@ -6,7 +6,10 @@ int flag[2] = {0, 0};
 int turn = 0;
 int saldo = 1000;
 
-// Protocolo de entrada: Indica que el hilo i quiere entrar a la sección crítica.
+/*
+Protocolo de entrada.
+Indica que el hilo i quiere entrar a la sección crítica.
+*/
 void entrada(int i) {
     int j = 1 - i;
     flag[i] = 1;
@@ -21,6 +24,7 @@ void entrada(int i) {
         }
     }
 }
+
 // Protocolo de salida: Cede el turno al otro hilo y libera su intención.
 void salida(int i) {
     turn = 1 - i;

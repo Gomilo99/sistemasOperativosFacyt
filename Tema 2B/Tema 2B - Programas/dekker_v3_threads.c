@@ -11,48 +11,34 @@ Version 3: Bandera + turno.
 La bandera indica que quiere entrar.
 El turno resuelve el conflicto si ambos quieren entrar al mismo tiempo.
 */
-void* proceso_0(void* arg) {
+void* hilo_0(void* arg) {
     /*
     Código que no afecta datos compartidos
     */
-
     estadoHilo[0] = 1;
-
     while (estadoHilo[1] && turnoHilo == 1) {
         /* Espera su turno */
     }
-
     // Entra a la seccion critica
     saldo -= 500;
-
     // Cambio de turno
     turnoHilo = 1;
-
     // Resto del codigo
     estadoHilo[0] = 0;
     return NULL;
 }
-
-/*
-Hilo 1: misma lógica, pero con su propia bandera.
-*/
-void* proceso_1(void* arg) {
+void* hilo_1(void* arg) {
     /*
     Código que no afecta datos compartidos
     */
-
     estadoHilo[1] = 1;
-
     while (estadoHilo[0] && turnoHilo == 0) {
         /* Espera su turno */
     }
-
     // Entra a la seccion critica
     saldo -= 300;
-
     // Cambio de turno
     turnoHilo = 0;
-
     // Resto del codigo
     estadoHilo[1] = 0;
     return NULL;
@@ -62,7 +48,7 @@ int main() {
     printf("=== DEKKER V3 ===\n");
     printf("Saldo inicial: %d\n\n", saldo);
 
-    ThreadPair procesos = crear_procesos(proceso_0, proceso_1);
+    ThreadPair procesos = crear_procesos(hilo_0, hilo_1);
 
     esperar_procesos(procesos);
 
