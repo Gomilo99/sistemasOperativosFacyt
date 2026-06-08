@@ -1,79 +1,86 @@
-// 03-lamport_bakery.c
+// lamport_bakery_n_mutex.c
 #include <stdio.h>
 #include "mutex.h"
 
-// Variables compartidas
-int choosing[2] = {0, 0};   // Indica si el hilo está eligiendo número
-int number[2]   = {0, 0};   // Número de ticket asignado a cada hilo
-int saldo = 1000;           // Recurso compartido
+// Número de hilos
+#define NUM_THREADS 5
+// Cantidad que resta cada hilo
+#define CANTIDAD_RESTA 100
 
-// Protocolo de entrada para el hilo i (i = 0 o 1)
+// Variables compartidas
+int choosing[NUM_THREADS];
+int number[NUM_THREADS];
+int saldo = 1000;
+
+// Máximo de dos enteros
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+// Protocolo de entrada para el hilo i
 void entrada(int i) {
     int j;
-    // Paso 1: elegir un número de ticket
     choosing[i] = 1;
-    number[i] = 1 + (number[0] > number[1] ? number[0] : number[1]);
+    // Obtener el ticket máximo actual
+    int max_number = 0;
+    for (j = 0; j < NUM_THREADS; j++) {
+        max_number = max(max_number, number[j]);
+    }
+    number[i] = max_number + 1;
     choosing[i] = 0;
-    // Paso 2: esperar a que todos los hilos con ticket menor terminen
-    for (j = 0; j < 2; j++) {
-        // Esperar si el otro hilo está eligiendo
-        while (choosing[j]) {
-            // espera activa
-        }
-        // Esperar si el otro hilo tiene ticket y su ticket es menor,
-        // o si es igual pero su índice es menor (para romper simetría)
-        while (number[j] != 0 && 
-                (number[j] < number[i] ||
+
+    // Esperar a todos los hilos con ticket menor
+    for (j = 0; j < NUM_THREADS; j++) {
+        while (choosing[j]);   // esperar a que j termine de elegir
+        while (number[j] != 0 &&
+               (number[j] < number[i] ||
                 (number[j] == number[i] && j < i))) {
             // espera activa
         }
     }
 }
 
-// Protocolo de salida para el hilo i
+// Protocolo de salida
 void salida(int i) {
-    number[i] = 0;   // Libera el ticket
+    number[i] = 0;
 }
 
-// Hilo 0: retira 500 del saldo
-void* hilo_0(void* arg) {
-    // Sección no crítica (código que no toca datos compartidos)
-    entrada(0);          // Protocolo de entrada
+// Función que ejecuta cada hilo
+void* hilo(void* arg) {
+    int i = *(int*)arg;   // índice del hilo
+    free(arg);            // liberar la memoria reservada en crear_n_procesos
 
     // Sección crítica
-    saldo -= 500;
-    printf("Hilo 0 ejecutó SC. Saldo: %d\n", saldo);
+    entrada(i);
+    // SC: restar una cantidad fija al saldo
+    if (saldo >= CANTIDAD_RESTA) {
+        printf("Hilo %d resta %d. Saldo antes: %d\n", i, CANTIDAD_RESTA, saldo);
+        saldo -= CANTIDAD_RESTA;
+        printf("Hilo %d termina SC. Saldo ahora: %d\n", i, saldo);
+    } else {
+        printf("Hilo %d no pudo restar (saldo insuficiente: %d)\n", i, saldo);
+    }
+    salida(i);
 
-    salida(0);           // Protocolo de salida
-    // Resto del código
-    return NULL;
-}
-
-// Hilo 1: retira 300 del saldo
-void* hilo_1(void* arg) {
-    // Sección no crítica
-    entrada(1);          // Protocolo de entrada
-
-    // Sección crítica
-    saldo -= 300;
-    printf("Hilo 1 ejecutó SC. Saldo: %d\n", saldo);
-
-    salida(1);          // Protocolo de salida
     return NULL;
 }
 
 int main() {
-    printf("=== LAMPORT BAKERY ALGORITHM ===\n");
-    printf("Saldo inicial: %d\n\n", saldo);
+    printf("=== ALGORITMO DE LAMPORT (PANADERÍA) PARA %d HILOS ===\n", NUM_THREADS);
+    printf("Saldo inicial: %d\n", saldo);
+    printf("Cada hilo resta %d\n\n", CANTIDAD_RESTA);
 
-    // Crear y lanzar los dos hilos mediante la librería mutex
-    ThreadPair hilos = crear_procesos(hilo_0, hilo_1);
+    // Crear los hilos usando la librería mutex extendida
+    ThreadArray hilos = crear_n_procesos(NUM_THREADS, hilo);
 
-    // Esperar a que ambos terminen
-    esperar_procesos(hilos);
+    // Esperar a que terminen
+    esperar_n_procesos(hilos);
 
-    printf("\nSaldo final esperado: 200\n");
-    printf("Saldo final obtenido: %d\n", saldo);
+    // Liberar recursos
+    liberar_n_procesos(hilos);
+
+    printf("\nSaldo final: %d\n", saldo);
+    printf("Saldo esperado: %d\n", 1000 - NUM_THREADS * CANTIDAD_RESTA);
     return 0;
 }
 
