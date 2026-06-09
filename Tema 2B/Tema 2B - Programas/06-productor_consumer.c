@@ -17,14 +17,11 @@ semaphore sem_full;    // elementos llenos (inicial = 0)
 
 void* productor(void* arg) {
     for (int i = 0; i < NUM_ITEMS; i++) {
-        printf("Productor: produce %d\n", i);
         usleep(rand() % 200000);
-
         wait(&sem_empty);   // espera un hueco
         wait(&sem_mutex);   // protege buffer
 
         buffer[in] = i;
-        printf("Productor: inserta %d en pos %d\n", i, in);
         in = (in + 1) % BUFFER_SIZE;
 
         signal(&sem_mutex);
@@ -32,20 +29,17 @@ void* productor(void* arg) {
     }
     return NULL;
 }
-
 void* consumidor(void* arg) {
     for (int i = 0; i < NUM_ITEMS; i++) {
         wait(&sem_full);     // espera elemento
         wait(&sem_mutex);    // protege buffer
 
         int item = buffer[out];
-        printf("Consumidor: toma %d de pos %d\n", item, out);
         out = (out + 1) % BUFFER_SIZE;
 
         signal(&sem_mutex);
         signal(&sem_empty);   // avisa que hay un hueco
 
-        printf("Consumidor: consume %d\n", item);
         usleep(rand() % 200000);
     }
     return NULL;
