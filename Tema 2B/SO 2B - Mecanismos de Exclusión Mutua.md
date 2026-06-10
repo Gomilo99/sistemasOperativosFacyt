@@ -5,12 +5,17 @@ tags:
   - estudio
   - sistemas_operativos
 creado: 05/06/2026
-modificado: 07/06/2026
+modificado: 10/06/2026
 tipo: Concepto
 base:
   - "[[A-Sistemas Operativos]]"
   - "[[04-Recursos]]"
 ---
+## Links
+- [[SO - Sincronización]]
+- [[SO - Algoritmo del Banquero]]
+- [[SO - Filósofos comensales]]
+- [[SO - Barbero Dormilón]]
 ## Exclusión Mutua
 La **exclusión mutua** es un requisito fundamental en la gestión de procesos concurrentes que garantizan que **solo un proceso a la vez pueda acceder a un recurso compartido** o ejecutar su **sección crítica**.
 A continuación, se detallan sus aspectos más importantes:
@@ -184,6 +189,7 @@ void escritor() {
 	4. `Lector1` y `Lector2` terminan; el ultimo libera `db` permitiendo que el `Escritor` entre.
 ---
 ### 3. Problema del Barbero Dormilón
+[[SO - Barbero Dormilón]]
 - **Planteamiento e Historia**: Propuesto originalmente por Dijkstra como una analogía de la coordinación entre procesos y recursos. Describe una peluquería con un barbero, una silla de trabajo y una sala de espera con sillas limitadas.
 - **Qué resuelve**: Coordina la interacción entre un servidor y clientes sin caer en competencia. Evita que el barbero "corte el aire" si no hay nadie sentado y gestiona el rechazo de clientes si la capacidad está llena.
 - **Requerimientos**: Semáforos para señalizar clientes listos, barberos libres y exclusión mutua para el conteo de sillas.
@@ -226,7 +232,7 @@ void cliente() {
 	2. Llega un `Cliente`, decremente `sillas_libres`, ejecuta `signal(clientes)` despertando al `Barbero` y espera en `wait(barbero)` despierta, indica que está listo (`signal(barbero`) y corta el pelo.
 ---
 ### 4. Problema de los Filósofos Comensales
-
+[[SO - Filósofos comensales]]
 - **Planteamiento e Historia:** Propuesto por Dijkstra, es un problema clásico para ilustrar los desafíos de la sincronización, el **interbloqueo** (_deadlock_) y la **inanición** (_starvation_). Cinco filósofos pasan la vida pensando y comiendo espaguetis en una mesa circular con cinco tenedores (uno entre cada plato).
 - **Qué resuelve:** Representa la necesidad de asignar recursos escasos entre procesos de manera que se evite que todos queden bloqueados esperando un recurso que otro tiene (espera circular).
 - **Requerimientos:** Una estructura que controle el estado de cada filósofo (`pensando`, `hambriento`, `comiendo`) y semáforos para los tenedores o una solución con monitor.
@@ -271,3 +277,14 @@ monitor CenaFilosofos {
 | **Lectores y Escritores** | El **catalogo de una biblioteca** en línea donde miles de usuarios consultan (leen) y solo los bibliotecarios actualizan (escriben). Sistemas de reservación de aerolíneas.               |
 | **Barbero Dormilón**      | Un **ayudante de cátedra** en su oficina que ayuda a estudiantes; si no hay nadie, duerme, y si hay muchos, estos esperan en sillas en el pasillo.                                        |
 | **Filósofos Comensales**  | Procesos que compiten por el **acceso exclusivo a un número limitado de dispositivos** de E/S, como unidades de cinta o escáneres, donde se necesita más de uno para completar una tarea. |
+## Interbloqueos
+### Tabla resumen
+
+| **Método / Concepto**         | **Definición**                                                                                                     | **Principios Fundamentales**                                                                                                                                               | **Condiciones de Aplicación / Funcionamiento**                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Prevención** _(Prevention)_ | Diseñar el sistema de modo que sea teóricamente imposible que ocurra un interbloqueo.                              | Atacar y eliminar al menos una de las **cuatro condiciones de Coffman** (Exclusión mutua, Retención y espera, Sin desalojo, Espera circular).                              | * **Exclusión mutua:** Compartir recursos (si es posible).<br><br>  <br><br>* **Retención y espera:** Exigir que los procesos soliciten todos sus recursos al inicio.<br><br>  <br><br>* **Sin desalojo:** Si un proceso pide un recurso y se le niega, debe liberar los que ya tiene.<br><br>  <br><br>* **Espera circular:** Establecer un orden lineal estricto para la solicitud de recursos. |
+| **Detección** _(Detection)_   | Permitir que el interbloqueo ocurra de manera libre, pero emplear algoritmos periódicos para identificarlo.        | Monitorear el estado del sistema mediante estructuras de datos especiales para descubrir si se ha formado un ciclo de espera.                                              | * Requiere el uso de un **Grafo de Asignación de Recursos (RAG)** o matrices de asignación/petición (como en el Algoritmo del Banquero en modo detección).<br><br>  <br><br>* El sistema debe ejecutar el algoritmo de detección periódicamente o cuando baja el rendimiento de la CPU.                                                                                                           |
+| **Recuperación** _(Recovery)_ | Acciones que toma el sistema una vez que el algoritmo de detección ha confirmado la existencia de un interbloqueo. | Romper el ciclo de interbloqueo eliminando procesos o quitándoles recursos de manera forzada.                                                                              | Se aplica inmediatamente después de la Detección. Métodos principales:<br><br>  <br><br>* **Terminación de procesos:** Abortar todos los procesos implicados o uno por uno hasta romper el ciclo.<br><br>  <br><br>* **Desalojo de recursos:** Quitar un recurso a un proceso (haciendo un _rollback_ a un estado seguro anterior) y dárselo a otro.                                              |
+| **Inanición** _(Starvation)_  | **No es un método**, sino un problema donde un proceso queda postergado indefinidamente mientras otros avanzan.    | Ocurre por una asignación de recursos injusta o como **efecto secundario de la prevención/recuperación** (ej. elegir siempre al mismo proceso como víctima para desalojo). | * Un proceso de baja prioridad solicita un recurso que constantemente se le asigna a procesos de mayor prioridad.<br><br>  <br><br>* Para solucionarlo, se aplican técnicas de **envejecimiento (aging)**, aumentando la prioridad del proceso conforme pasa el tiempo.                                                                                                                           |
+### Algoritmo del Banquero
+[[SO - Algoritmo del Banquero]]

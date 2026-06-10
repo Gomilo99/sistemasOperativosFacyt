@@ -4,13 +4,18 @@ tags:
   - clase
   - sistemas_operativos
 creado: 04/06/2026
-modificado: 04/06/2026
+modificado: 10/06/2026
 tipo: Concepto
 base:
   - "[[A-Sistemas Operativos]]"
   - "[[04-Recursos]]"
 ---
 # Sincronización y Comunicación entre procesos
+## Links
+- [[SO - Sincronización]]
+- [[SO - Algoritmo del Banquero]]
+- [[SO - Filósofos comensales]]
+- [[SO - Barbero Dormilón]]
 ## Sincronización
 La sincronización es un conjunto de protocolos y mecanismos utilizados para preservar la integridad y consistencia del sistema, cuando varios procesos concurrentes comparten recursos que son reutilizables en serio (sólo pueden ser utilizados por un proceso a la vez). Su estado y operación pueden resultar corrompidos si son manipulados concurrentemente y sin sincronización por más de un procesos. Ej: variables compartidas para Lectura-Escritura, dispositivos físicos como impresoras, etc.
 

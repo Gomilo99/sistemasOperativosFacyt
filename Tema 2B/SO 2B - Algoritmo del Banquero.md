@@ -10,6 +10,11 @@ base:
   - "[[04-Recursos]]"
   - "[[A-Sistemas Operativos]]"
 ---
+## Links
+- [[SO - Sincronización]]
+- [[SO - Algoritmo del Banquero]]
+- [[SO - Filósofos comensales]]
+- [[SO - Barbero Dormilón]]
 ## Algoritmo del Banquero (Banker's Algorithm) – Prevención de Deadlock
 El algoritmo del banquero, propuesto por Edger Dijkstra, es un algoritmo de **evitación de deadlocks** para sistemas con recursos múltiples. Su nombre proviene de la analogía con un banquero que concede préstamos a sus clientes asegurándose de que nunca se quede sin efectivo.
 ### ¿Qué problema resuelve?
