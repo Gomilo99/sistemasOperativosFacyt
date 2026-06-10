@@ -4,7 +4,7 @@ tags:
   - estudio
   - sistemas_operativos
 creado: 28/05/2026
-modificado: 28/05/2026
+modificado: 29/05/2026
 tipo: Concepto
 base:
   - "[[A-Sistemas Operativos]]"
@@ -142,10 +142,6 @@ En sistemas con múltiples CPUs/cores:
 2. **Soporte de interrupciones** para E/S (disparan wakeups y boosts).
 3. MMU/soporte de cambio de contexto (registros, TLB, etc.) — común a cualquier SO moderno.
 4. En multicore: mecanismos de **IPI** (inter-processor interrupts) para coordinación/balanceo.
-#### Funcionamiento (visión general)
-- Planificación **preemptive, por prioridades**, orientada a **hilos** (threads).
-- Usa **prioridades dinámicas** (boost para I/O-bound/interactivos) y **quantums** que varían por clase/edición.
-- El scheduler elige el hilo listo de **mayor prioridad**; round-robin entre hilos de la misma prioridad.
 
 ### Planificación en sistemas Multiprocesadores (Multi-CPU / SMP)
 #### Funcionamiento
