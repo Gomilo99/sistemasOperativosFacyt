@@ -5,7 +5,7 @@ tags:
   - estudio
   - sistemas_operativos
 creado: 05/06/2026
-modificado: 06/06/2026
+modificado: 07/06/2026
 tipo: Concepto
 base:
   - "[[A-Sistemas Operativos]]"
@@ -44,8 +44,64 @@ Son mecanismo más abstractos que facilitan el trabajo del programador:
 - **Solaris**: Utiliza **mútex adaptativos**, bloqueos de lectura-escritura y colas de bloqueos (turnstiles).
 - **Windows XP**: Emplea **objetos despachadores** como mutantes (mutex en modo kernel o usuario), semáforos, eventos y temporizadores.
 - **Linux**: Utiliza principalmente **spinlocks** y **semáforos** para la sincronización del kernel.
+## Soluciones de Software
+### Algoritmos de Dekker
+El algoritmo de Dekker fue la **primera solución de software correcta** al problema de la exclusión mutua para dos procesos concurrentes. Fue desarrollado por el matemático holandés Theodorus Dekker y popularizado por Edsger Dijkstra en la década de 1960.
 
-## Mecanismos de exclusión mutua
+Su desarrollo se explica tradicionalmente a través de cinco versiones o "intentos" que ilustran los errores comunes en la programación concurrente hasta llegar a la solución definitiva.
+
+Las 5 Versiones del Algoritmo de Dekker
+
+1. Versión 1: Alternancia Estricta
+
+- **Funcionamiento:** Utiliza una variable compartida `turno`. Un proceso solo puede entrar si es su turno; al salir, cede el turno al otro.
+- **Problemas:** Obliga a una alternancia estricta, por lo que la velocidad del sistema la dicta el proceso más lento. Si un proceso falla fuera de su sección crítica, bloquea al otro permanentemente.
+
+2. Versión 2: Uso de Banderas (Señales)
+
+- **Funcionamiento:** Cada proceso tiene una bandera (`flag`) para indicar si está en su sección crítica. Antes de entrar, comprueba que la bandera del otro sea `falsa`.
+- **Problemas:** **No garantiza la exclusión mutua**. Es posible que ambos procesos comprueben las banderas simultáneamente, las vean en `falso` y entren ambos a la sección crítica antes de poder actualizar las suyas a `verdadero`.
+
+3. Versión 3: Bandera de Intención Previa
+
+- **Funcionamiento:** Para evitar el error de la versión 2, el proceso pone su bandera en `verdadero` **antes** de comprobar la del otro.
+- **Problemas:** Provoca un **interbloqueo (deadlock)**. Si ambos ponen su bandera en `verdadero` al mismo tiempo, ambos se quedarán esperando indefinidamente a que el otro baje la suya.
+
+4. Versión 4: Cortesía (Postergación Indefinida)
+
+- **Funcionamiento:** Similar a la versión 3, pero si un proceso ve que el otro también quiere entrar, baja su propia bandera por un momento para permitir el paso del otro y luego lo intenta de nuevo.
+- **Problemas:** Puede causar **postergación indefinida (livelock)**. Los procesos podrían entrar en un ciclo infinito de "cortesía" donde ambos bajan y suben sus banderas al mismo ritmo sin que ninguno llegue a entrar nunca.
+
+5. Versión 5: La Solución Correcta
+
+- **Funcionamiento:** Combina las banderas de intención con la variable de `turno` para resolver conflictos de prioridad. Si ambos quieren entrar, el proceso que no tiene el turno baja su bandera y espera a que sea su momento, permitiendo que el favorecido pase.
+- **Resultado:** Garantiza la **exclusión mutua**, evita el interbloqueo y asegura que no haya postergación indefinida.
+
+Implementación de la Solución Correcta (Pseudocódigo)
+
+La lógica final para un proceso Pi​ frente a un proceso Pj​ es la siguiente:
+
+```
+do {
+    flag[i] = TRUE; // El proceso i quiere entrar
+    while (flag[j]) { // Si el proceso j también quiere...
+        if (turn == j) { // ...y es el turno de j:
+            flag[i] = FALSE; // i cede su intención (cortesía)
+            while (turn == j); // espera activamente su turno
+            flag[i] = TRUE; // reclama su intención de nuevo
+        }
+    }
+    // SECCIÓN CRÍTICA
+    turn = j; // Al terminar, cede el turno al otro proceso
+    flag[i] = FALSE; // Baja su bandera
+    // SECCIÓN RESTANTE
+} while (TRUE);
+```
+
+Importancia Histórica
+
+Aunque hoy existen soluciones más simples y elegantes como el **Algoritmo de Peterson**, Dekker sentó las bases para resolver la sección crítica exclusivamente mediante software, sin depender de instrucciones especiales de hardware (como _TestAndSet_) ni de la desactivación de interrupciones.
+## Algoritmos Clásicos
 A continuación se presenta una explicación detallada de los algoritmos clásicos de sincronización, su funcionamiento, implementación y contexto histórico.
 ### 1. Problema del Productor-Consumidor (Buffer Acotado y No Acotado)
 - **Planteamiento e Historia**: Este modelo, también conocido como el problema del buffer limitado, es un paradigma representativo de muchos procesos que cooperan en un sistema operativo. Fue desarrollado para ilustrar el poder de las primitivas de sincronización. Plantea un escenario con uno o más **productores** que generan datos y un **consumidor** que los retira de un almacén compartido (buffer).
